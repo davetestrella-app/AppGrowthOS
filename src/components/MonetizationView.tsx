@@ -75,7 +75,14 @@ export default function MonetizationView({
 
   const getTrialShareLink = () => {
     // Generates a mock onboarding URL for potential clients
-    const base = window.location.href.split("?")[0];
+    let base = window.location.href.split("?")[0];
+    
+    // Auto-replace developer subdomain (-dev-) with public shared subdomain (-pre-) 
+    // to prevent "Page not found / Unauthorized" issues for other users or mobile devices.
+    if (base.includes("ais-dev-")) {
+      base = base.replace("ais-dev-", "ais-pre-");
+    }
+    
     return `${base}?sim_role=trial_active&ref_name=${encodeURIComponent(businessName || "Creator")}`;
   };
 
@@ -246,6 +253,10 @@ export default function MonetizationView({
                 {copiedLink === "share_link" ? "¡Copiado!" : <><Copy className="h-3 w-3" /> Copiar Link</>}
               </button>
             </div>
+            
+            <p className="text-[10px] text-zinc-500 italic">
+              * Nota: El generador convierte automáticamente el enlace al servidor público (subdominio público) para asegurar que abra perfectamente en dispositivos móviles y para tus clientes.
+            </p>
             
             <div className="text-[11.5px] text-zinc-400 flex items-start gap-2.5 bg-emerald-500/5 border border-emerald-500/10 p-3.5 rounded-xl">
               <Info className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
