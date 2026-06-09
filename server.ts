@@ -37,17 +37,7 @@ const asyncHandler = (fn: Function) => (req: express.Request, res: express.Respo
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 
-// Error handling payload structure
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  if (res.headersSent) {
-    return next(err);
-  }
-  console.error("Error en el servidor:", err);
-  res.status(500).json({
-    success: false,
-    error: err.message || "Un error inesperado ocurrió en el servidor.",
-  });
-});
+
 
 // SYSTEM PROMPT / BASIC CONTEXT FOR GROWTHOS AI
 const SYSTEM_INSTRUCTION = `Eres GrowthOS AI, un Director de Marketing, Estratega de Contenido y Consultor de Crecimiento para emprendedores, marcas personales y negocios.
@@ -425,6 +415,18 @@ app.post("/api/chat", asyncHandler(async (req: express.Request, res: express.Res
   const reply = response.text || "No logré estructurar una respuesta en este momento.";
   res.json({ success: true, content: reply });
 }));
+
+// Error handling payload structure
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+  console.error("Error en el servidor:", err);
+  res.status(500).json({
+    success: false,
+    error: err.message || "Un error inesperado ocurrió en el servidor.",
+  });
+});
 
 
 // Vite integration for dev vs production build
