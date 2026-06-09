@@ -92,7 +92,7 @@ export default function App() {
   });
 
   const [paymentLink, setPaymentLink] = React.useState(() => {
-    return localStorage.getItem("growthos_payment_link") || "";
+    return localStorage.getItem("growthos_payment_link") || "https://pay.hotmart.com/N106231672J";
   });
 
   // Sync to outer localStorage whenever core states modify

@@ -45,7 +45,7 @@ export default function MonetizationView({
   setPaymentLink,
 }: MonetizationViewProps) {
   const [copiedLink, setCopiedLink] = React.useState<string | null>(null);
-  const [checkoutService, setCheckoutService] = React.useState<"stripe" | "whatsapp" | "paypal">("stripe");
+  const [checkoutService, setCheckoutService] = React.useState<"stripe" | "whatsapp" | "paypal" | "hotmart">("hotmart");
   const [generatedScript, setGeneratedScript] = React.useState("");
 
   React.useEffect(() => {
@@ -59,8 +59,10 @@ export default function MonetizationView({
       text = `🛒 ESTRATEGIA STRIPE SAAS:\n1. Crea una cuenta en Stripe.com\n2. Ve a 'Product Catalog' y crea un Producto llamado "GrowthOS - ${userCompany} Platinum"\n3. Define Pago Recurrente mensual de ${priceText}\n4. Activa la casilla de 'Trial Gratuito' y coloca ${daysText} días.\n5. Copia el 'Payment Link' generado por Stripe y pégalo abajo. ¡Los clientes que se registren tendrán retención de tarjeta automática después de ${daysText} días!`;
     } else if (checkoutService === "whatsapp") {
       text = `💬 ESTRATEGIA CIERRE MANUAL POR WHATSAPP:\n¡Excelente para iniciar rápido sin configurar pasarelas! Usa este mensaje de venta:\n"¡Hola! Vi que te interesó el plan GrowthOS para potenciar tu marca. Te activo una prueba gratuita de ${daysText} días para que veas el plan de publicaciones de 30 días. Si te encanta, la suscripción mensual es de solo ${priceText} vía PayPal/Transferencia. ¿Te parece bien que te mande tu acceso?"`;
-    } else {
+    } else if (checkoutService === "paypal") {
       text = `🅿️ ESTRATEGIA PAYPAL SUBSCRIPTION:\n1. Ve a PayPal Developer o tu cuenta Business.\n2. Crea un Producto "Suscripción GrowthOS ${userCompany}" de ${priceText}/mes.\n3. Añade un periodo de prueba de ${daysText} días a $0.00.\n4. Genera el botón inteligente e inserta el enlace de suscripción directo en el campo inferior. ¡Automatizado y global!`;
+    } else {
+      text = `🔥 ESTRATEGIA DE SUSCRIPCIÓN EN HOTMART:\n1. Regístrate o inicia sesión en hotmart.com como Creador.\n2. Crea un Producto Digital y selecciona el formato de tipo "Suscripción" llamado "GrowthOS - ${userCompany} Active Access".\n3. En la configuración del plan, define la recurrencia mensual a ${priceText}.\n4. Activa la casilla de de "Período de prueba" (Free Trial) colocando exactamente ${daysText} días de prueba.\n5. Ve a "Hotlinks" de tu producto, copia el "Enlace a la Página de Pago Directa" (Checkout de Hotmart) y pégalo en el campo inferior de esta sección.\n\n¡Listo! Hotmart se encargará del cobro recurrente automático, ofrecerá más de 12 métodos de pago locales latinoamericanos (efectivo, PSE, Pix, etc.) y asegurará la entrega tras culminar tu prueba de ${daysText} días.`;
     }
     setGeneratedScript(text);
   }, [monthlyPrice, trialDays, businessName, checkoutService]);
@@ -136,7 +138,7 @@ export default function MonetizationView({
               {/* Payment Link Custom URL */}
               <div className="space-y-1.5 col-span-2">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs font-semibold text-zinc-300">Enlace de Pago Activación (Stripe, WhatsApp o PayPal)</label>
+                  <label className="text-xs font-semibold text-zinc-300">Enlace de Pago Activación (Hotmart, Stripe, PayPal, o WhatsApp)</label>
                   <span className="text-[10px] text-emerald-400 font-mono">Para rellenar en el botón SaaS del Paywall</span>
                 </div>
                 <input 
@@ -159,11 +161,12 @@ export default function MonetizationView({
             </div>
 
             {/* Provider Selector Buttons */}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
                 { id: "stripe", label: "Stripe Subscriptions" },
-                { id: "whatsapp", label: "Cierre Manual (WhatsApp)" },
-                { id: "paypal", label: "PayPal Business" }
+                { id: "whatsapp", label: "Cierre Manual" },
+                { id: "paypal", label: "PayPal Business" },
+                { id: "hotmart", label: "Hotmart Suscripción" }
               ].map((prov) => (
                 <button
                   type="button"
@@ -171,7 +174,7 @@ export default function MonetizationView({
                   onClick={() => setCheckoutService(prov.id as any)}
                   className={`px-2 py-2 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer
                     ${checkoutService === prov.id 
-                      ? "bg-emerald-500/10 border border-emerald-500/40 text-emerald-400" 
+                      ? "bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 font-bold" 
                       : "bg-zinc-950 border border-zinc-800/80 text-zinc-400 hover:text-white"
                     }
                   `}
@@ -195,6 +198,30 @@ export default function MonetizationView({
                     className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1 hover:underline"
                   >
                     Abrir Stripe Dashboard <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              )}
+              {checkoutService === "hotmart" && (
+                <div className="flex justify-end">
+                  <a 
+                    href="https://hotmart.com" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="text-[11px] font-mono font-bold text-orange-400 flex items-center gap-1 hover:underline"
+                  >
+                    Abrir Hotmart <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              )}
+              {checkoutService === "paypal" && (
+                <div className="flex justify-end">
+                  <a 
+                    href="https://paypal.com" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="text-[11px] font-mono font-bold text-blue-400 flex items-center gap-1 hover:underline"
+                  >
+                    Abrir PayPal Business <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
               )}
