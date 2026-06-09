@@ -254,9 +254,15 @@ export default function MonetizationView({
               </button>
             </div>
             
-            <p className="text-[10px] text-zinc-500 italic">
-              * Nota: El generador convierte automáticamente el enlace al servidor público (subdominio público) para asegurar que abra perfectamente en dispositivos móviles y para tus clientes.
-            </p>
+            <div className="bg-amber-500/5 border border-amber-500/25 p-3.5 rounded-xl text-[11px] text-amber-300/90 leading-relaxed font-sans space-y-1">
+              <span className="font-bold flex items-center gap-1">⚠️ Limitación de Seguridad del Entorno de AI Studio:</span>
+              <p>
+                Los enlaces de prueba de la plataforma (<code className="text-zinc-300 font-mono">ais-dev-...</code> y <code className="text-zinc-300 font-mono">ais-pre-...</code>) son <strong>privados y protegidos</strong>. Solo tú (con tu cuenta de desarrollador de Google logueada) puedes abrirlos. Si intentas abrirlos en un móvil sin tu sesión iniciada, en una ventana de incógnito, o se lo envías a un tercero, verás el error de Google <strong>"Page not found / Unauthorized"</strong>.
+              </p>
+              <p className="mt-1 pt-1 border-t border-amber-500/10">
+                <strong>¿Cómo hacerlo 100% público para tus clientes?</strong> Para compartirlo públicamente sin restricciones, descarga el código de la app como <strong>ZIP</strong> o expórtalo a <strong>GitHub</strong> usando el menú de opciones superior de AI Studio. Luego, podrás subir el código en 1 minuto a servicios de hosting como <strong>Vercel, Netlify, Render o Railway</strong> usando tu dominio propio o una URL gratis e ilimitada.
+              </p>
+            </div>
             
             <div className="text-[11.5px] text-zinc-400 flex items-start gap-2.5 bg-emerald-500/5 border border-emerald-500/10 p-3.5 rounded-xl">
               <Info className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
