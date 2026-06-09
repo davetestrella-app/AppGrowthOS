@@ -83,7 +83,11 @@ export default function App() {
   });
 
   const [monthlyPrice, setMonthlyPrice] = React.useState(() => {
-    return localStorage.getItem("growthos_monthly_price") || "$7.00 USD";
+    const saved = localStorage.getItem("growthos_monthly_price");
+    if (!saved || saved.includes("29") || saved === "$29.00 USD" || saved === "$29 USD" || saved === "29") {
+      return "$7.00 USD";
+    }
+    return saved;
   });
 
   const [trialDays, setTrialDays] = React.useState(() => {
