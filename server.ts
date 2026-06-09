@@ -37,6 +37,62 @@ const asyncHandler = (fn: Function) => (req: express.Request, res: express.Respo
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function generateContentWithRetryAndFallback(params: {
+  contents: any;
+  config?: any;
+  defaultModel?: string;
+}) {
+  const ai = getAIClient();
+  const primaryModel = params.defaultModel || "gemini-3.5-flash";
+  const models = [primaryModel, "gemini-3.1-flash-lite", "gemini-3.1-pro-preview"];
+  
+  let lastError: any = null;
+
+  for (const model of models) {
+    let retries = 3;
+    let delay = 1000;
+
+    while (retries > 0) {
+      try {
+        console.log(`Intentando conectar con el modelo ${model}...`);
+        const response = await ai.models.generateContent({
+          model: model,
+          contents: params.contents,
+          config: params.config,
+        });
+        return response;
+      } catch (err: any) {
+        lastError = err;
+        const errMsg = (err?.message || "").toLowerCase();
+        const is503 = errMsg.includes("503") || 
+                      errMsg.includes("unavailable") || 
+                      errMsg.includes("high demand") || 
+                      errMsg.includes("overloaded") || 
+                      errMsg.includes("temporary") ||
+                      errMsg.includes("rate limit") ||
+                      errMsg.includes("429");
+        
+        console.error(`Error llamando a ${model} (Intentos restantes: ${retries - 1}):`, err);
+        
+        if (is503) {
+          retries--;
+          if (retries > 0) {
+            console.log(`Pausa de reintento de ${delay}ms por sobrecarga temporal o limite de llamadas...`);
+            await sleep(delay);
+            delay *= 2;
+            continue;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  throw lastError || new Error("Todos los modelos de IA se encuentran actualmente con alta demanda.");
+}
+
 
 
 // SYSTEM PROMPT / BASIC CONTEXT FOR GROWTHOS AI
@@ -59,7 +115,6 @@ app.post("/api/diagnose", asyncHandler(async (req: express.Request, res: express
     return res.status(400).json({ success: false, error: "Faltan los datos del perfil del negocio." });
   }
 
-  const ai = getAIClient();
   const prompt = `Analiza detalladamente este negocio y genera un diagnóstico estratégico que identifique:
   - Fortalezas (strengths)
   - Debilidades (weaknesses)
@@ -78,8 +133,7 @@ app.post("/api/diagnose", asyncHandler(async (req: express.Request, res: express
   Audiencia actual: ${profile.audienceSize}
   Horas disponibles para crear contenido: ${profile.availableHours}`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.5-flash",
+  const response = await generateContentWithRetryAndFallback({
     contents: prompt,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
@@ -112,7 +166,6 @@ app.post("/api/strategy", asyncHandler(async (req: express.Request, res: express
     return res.status(400).json({ success: false, error: "Se requiere el perfil del negocio para generar la estrategia." });
   }
 
-  const ai = getAIClient();
   const prompt = `Con base en el perfil del negocio y su diagnóstico de marketing, formula una estrategia de contenido de alta conversión y posicionamiento optimizado.
 
   Perfil:
@@ -126,8 +179,7 @@ app.post("/api/strategy", asyncHandler(async (req: express.Request, res: express
   Fortalezas: ${diagnostic?.strengths?.join(", ") || "No dadas"}
   Oportunidades: ${diagnostic?.opportunities?.join(", ") || "No dadas"}`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.5-flash",
+  const response = await generateContentWithRetryAndFallback({
     contents: prompt,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
@@ -160,7 +212,6 @@ app.post("/api/calendar", asyncHandler(async (req: express.Request, res: express
     return res.status(400).json({ success: false, error: "Se requiere el perfil para estructurar el calendario." });
   }
 
-  const ai = getAIClient();
   const prompt = `Genera un calendario de publicaciones mensual estratégico de 30 días organizados de forma equilibrada en los cuatro pilares:
   1. Autoridad: Demuestra conocimiento y estatus (casos de estudio, métricas, logros, certificaciones).
   2. Educación: Resuelven problemas específicos y eliminan objeciones de compra.
@@ -177,8 +228,7 @@ app.post("/api/calendar", asyncHandler(async (req: express.Request, res: express
 
   El calendario debe incluir exactamente 15 o hasta 30 días de publicaciones estratégicas. Genera 15 publicaciones consecutivas de alto valor que cubran un período de 30 días (ej: Día 1, Día 3, Día 5 ... etc, o consecutivas de Día 1 a Día 15). Describe perfectamente el pilar, tema, objetivo, formato de publicación (ej. Carrusel, Reel, Video corto, Post, Newsletter, etc.) y una llamada a la acción (CTA) orientada a resultados empresariales.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.5-flash",
+  const response = await generateContentWithRetryAndFallback({
     contents: prompt,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
@@ -220,7 +270,6 @@ app.post("/api/ideas", asyncHandler(async (req: express.Request, res: express.Re
     return res.status(400).json({ success: false, error: "Datos del perfil faltantes." });
   }
 
-  const ai = getAIClient();
   const prompt = `Genera 4 ideas completas de publicaciones estratégicas basadas en el nicho del producto.
   Categoría deseada: ${category || "General de ventas o autoridad"}
   Palabra clave: ${keyword || "Estrategia clave"}
@@ -237,8 +286,7 @@ app.post("/api/ideas", asyncHandler(async (req: express.Request, res: express.Re
   - development (desarrollo, puntos clave, guías paso a paso o historia corta)
   - cta (llamado a la acción que invite a interactuar, enviar DM o agendar llamada)`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.5-flash",
+  const response = await generateContentWithRetryAndFallback({
     contents: prompt,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
@@ -280,7 +328,6 @@ app.post("/api/script", asyncHandler(async (req: express.Request, res: express.R
     return res.status(400).json({ success: false, error: "Datos insuficientes para generar el guión." });
   }
 
-  const ai = getAIClient();
   const prompt = `Genera un guión estructurado de video de alto impacto (formato: ${desiredFormat || "Reel / TikTok de 60 segundos"}) sobre el tema: "${topic}".
   Nicho del negocio: ${profile.industry}
   Producto representativo: ${profile.primaryProduct}
@@ -293,8 +340,7 @@ app.post("/api/script", asyncHandler(async (req: express.Request, res: express.R
   - solution: Presentación de tu solución/producto como el siguiente paso lógico.
   - cta: Un llamado a la acción enfocado a la conversión (ir al link, enviar DM con palabra clave, comentar para recibir material).`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.5-flash",
+  const response = await generateContentWithRetryAndFallback({
     contents: prompt,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
@@ -328,7 +374,6 @@ app.post("/api/audit", asyncHandler(async (req: express.Request, res: express.Re
     return res.status(400).json({ success: false, error: "Datos del perfil faltantes." });
   }
 
-  const ai = getAIClient();
   const prompt = `Realiza una auditoría avanzada de Instagram centrada en negocios y conversión con base en los siguientes datos de la cuenta:
   Bio de Instagram: "${instagramBio || "No especificada"}"
   Resumen de publicaciones principales: "${topPostsSummary || "No especificado"}"
@@ -352,8 +397,7 @@ app.post("/api/audit", asyncHandler(async (req: express.Request, res: express.Re
   - contentFeedback: Cuáles publicaciones cambiar o mejorar estructuralmente para capturar la atención de su nicho.
   - actionPlan: Plan de acción de 3 pasos numerados e inmediatos de aplicar. No incluyas relleno.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.5-flash",
+  const response = await generateContentWithRetryAndFallback({
     contents: prompt,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
@@ -388,8 +432,6 @@ app.post("/api/chat", asyncHandler(async (req: express.Request, res: express.Res
     return res.status(400).json({ success: false, error: "El mensaje del usuario está vacío." });
   }
 
-  const ai = getAIClient();
-
   // Reconstruct chat history and context
   const context = `Contexto del negocio actual:
   Nombre: ${profile?.businessName || "Sin registrar"}
@@ -404,8 +446,7 @@ app.post("/api/chat", asyncHandler(async (req: express.Request, res: express.Res
   // Use the ai.models.generateContent containing the conversation context
   const fullPrompt = `${context}\n\nHistorial Reciente:\n${(history || []).map((h: any) => `${h.sender === "user" ? "Usuario" : "GrowthOS AI"}: ${h.content}`).join("\n")}\n\nUsuario: ${message}\n\nGrowthOS AI:`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.5-flash",
+  const response = await generateContentWithRetryAndFallback({
     contents: fullPrompt,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
