@@ -87,7 +87,7 @@ export default function DiagnosticView({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
             {/* Business Name */}
-            <div className="space-y-1.5 col-span-2">
+            <div className="space-y-1.5 col-span-1 md:col-span-2">
               <label className="text-xs font-semibold text-zinc-300">Nombre del Negocio o Marca Personal *</label>
               <input 
                 type="text"
@@ -157,7 +157,7 @@ export default function DiagnosticView({
             </div>
 
             {/* idealCustomer */}
-            <div className="space-y-1.5 col-span-2">
+            <div className="space-y-1.5 col-span-1 md:col-span-2">
               <label className="text-xs font-semibold text-zinc-300">Cliente Ideal / Avatar principal *</label>
               <textarea 
                 rows={3}
@@ -200,7 +200,7 @@ export default function DiagnosticView({
           {/* Social Platforms checklist */}
           <div className="space-y-2 pt-1 border-t border-zinc-800/60">
             <label className="text-xs font-semibold text-zinc-300">Redes sociales utilizadas actuales o deseadas</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {socials.map((plat) => {
                 const active = profile.socialPlatforms.includes(plat);
                 return (

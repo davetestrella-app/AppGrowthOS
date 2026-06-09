@@ -143,7 +143,7 @@ export default function MonetizationView({
               </div>
 
               {/* Payment Link Custom URL */}
-              <div className="space-y-1.5 col-span-2">
+              <div className="space-y-1.5 col-span-1 md:col-span-2">
                 <div className="flex justify-between items-center">
                   <label className="text-xs font-semibold text-zinc-300">Enlace de Pago Activación (Hotmart, Stripe, PayPal, o WhatsApp)</label>
                   <span className="text-[10px] text-emerald-400 font-mono">Para rellenar en el botón SaaS del Paywall</span>

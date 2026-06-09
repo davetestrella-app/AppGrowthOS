@@ -45,8 +45,8 @@ async function generateContentWithRetryAndFallback(params: {
   defaultModel?: string;
 }) {
   const ai = getAIClient();
-  const primaryModel = params.defaultModel || "gemini-3.5-flash";
-  const models = [primaryModel, "gemini-3.1-flash-lite", "gemini-3.1-pro-preview"];
+  const primaryModel = params.defaultModel || "gemini-2.5-flash";
+  const models = [primaryModel, "gemini-2.5-pro"];
   
   let lastError: any = null;
 
