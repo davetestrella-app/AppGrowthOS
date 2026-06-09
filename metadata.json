@@ -1,0 +1,6 @@
+{
+  "name": "GrowthOS AI",
+  "description": "Plataforma SaaS de estrategia de contenido y consultoría de marketing impulsada por Inteligencia Artificial para marcas personales, emprendedores y negocios.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
