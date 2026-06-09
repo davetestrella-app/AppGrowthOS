@@ -83,7 +83,7 @@ export default function App() {
   });
 
   const [monthlyPrice, setMonthlyPrice] = React.useState(() => {
-    return localStorage.getItem("growthos_monthly_price") || "$29.00 USD";
+    return localStorage.getItem("growthos_monthly_price") || "$7.00 USD";
   });
 
   const [trialDays, setTrialDays] = React.useState(() => {
@@ -481,7 +481,7 @@ export default function App() {
               <div className="bg-zinc-950/85 border border-zinc-850 p-6 rounded-2xl space-y-2 max-w-sm mx-auto">
                 <span className="text-[10px] font-mono text-zinc-550 uppercase tracking-widest block font-bold leading-none">Suscripción Acceso Premium</span>
                 <div className="flex items-baseline justify-center gap-1.5 mt-1">
-                  <span className="text-3xl font-extrabold text-white font-display leading-none">{monthlyPrice || "$29.00 USD"}</span>
+                  <span className="text-3xl font-extrabold text-white font-display leading-none">{monthlyPrice || "$7.00 USD"}</span>
                   <span className="text-xs text-zinc-550">/ mes</span>
                 </div>
                 <p className="text-[10px] text-zinc-450 leading-relaxed font-sans font-medium">Acceso inmediato para optimizar tus publicaciones en segundos sin salir de la consola.</p>

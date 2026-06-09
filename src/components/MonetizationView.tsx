@@ -18,7 +18,8 @@ import {
   ExternalLink,
   Smartphone,
   ChevronRight,
-  Gift
+  Gift,
+  Clock
 } from "lucide-react";
 
 interface MonetizationViewProps {
@@ -50,7 +51,7 @@ export default function MonetizationView({
 
   React.useEffect(() => {
     // Generate script/guideline text based on configuration
-    const priceText = monthlyPrice || "$29.00 USD";
+    const priceText = monthlyPrice || "$7.00 USD";
     const daysText = trialDays || "7";
     const userCompany = businessName || "Mundo Fitness";
 
@@ -85,6 +86,184 @@ export default function MonetizationView({
     
     return `${base}?sim_role=trial_active&ref_name=${encodeURIComponent(businessName || "Creator")}`;
   };
+
+  if (simulatedRole !== "creator") {
+    const isPremium = simulatedRole === "premium_active";
+    const isExpired = simulatedRole === "trial_expired";
+    const displayPrice = monthlyPrice || "$7.00 USD";
+
+    return (
+      <div className="space-y-8 max-w-4xl mx-auto py-2 animate-fade-in text-zinc-100">
+        {/* State Banner */}
+        <div className="bg-zinc-900/60 border border-zinc-850 rounded-2xl p-6 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+          <div>
+            <span className="text-[10px] font-mono tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full uppercase font-bold">
+              {isPremium ? "Membresía Premium Pro" : isExpired ? "Periodo de Prueba Expirado" : "Periodo de Prueba Activo"}
+            </span>
+            <h2 className="text-xl font-display font-bold text-white mt-3">
+              {isPremium ? "¡Tienes Acceso Total Pro Habilitado!" : `GrowthOS AI Premium - Plan de Crecimiento`}
+            </h2>
+            <p className="text-xs text-zinc-400 mt-1 max-w-xl">
+              {isPremium 
+                ? "Disfruta de todas las herramientas avanzadas, diagnóstico de negocio, cronograma táctico y creador de guiones de conversión con IA de forma libre." 
+                : isExpired
+                ? `Tu periodo de evaluación gratuita de ${trialDays} días ha culminado. Desbloquea la suite completa hoy.`
+                : `Estás disfrutando de tu cuenta en periodo de prueba de ${trialDays} días. Tu acceso avanzado está activo.`
+              }
+            </p>
+          </div>
+          
+          <div className="shrink-0">
+            {isPremium ? (
+              <span className="flex items-center gap-2 py-2 px-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold font-mono">
+                <Check className="h-4 w-4" /> Activa
+              </span>
+            ) : (
+              <span className="flex items-center gap-2 py-2 px-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold font-mono animate-pulse">
+                <Clock className="h-4 w-4" /> {isExpired ? "Expirada" : "Prueba"}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Plan Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          {/* Pro Plan Card */}
+          <div className="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 rounded-3xl p-8 space-y-6 relative flex flex-col justify-between shadow-2xl">
+            <div className="absolute top-0 right-1/2 translate-x-1/2 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-md font-bold">
+                  PRO MEMBER
+                </span>
+                <span className="text-xs text-zinc-400">Pago seguro</span>
+              </div>
+              
+              <div className="space-y-1">
+                <h3 className="text-2xl font-bold font-display text-white">Consola de Crecimiento Pro</h3>
+                <p className="text-xs text-zinc-400">Acceso ilimitado a todas las herramientas de optimización de marca y guiones automatizados.</p>
+              </div>
+
+              <div className="py-4 border-t border-b border-zinc-800/80">
+                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest block font-bold leading-none">Precio de Suscripción</span>
+                <div className="flex items-baseline gap-1.5 mt-1.5">
+                  <span className="text-4xl font-extrabold text-white font-display tracking-tight">{displayPrice}</span>
+                  <span className="text-xs text-zinc-550">/ al mes</span>
+                </div>
+                <p className="text-[10px] text-emerald-400 mt-2 font-mono flex items-center gap-1">
+                  <Sparkles className="h-3 w-3 shrink-0" /> Garantía de satisfacción de 7 días
+                </p>
+              </div>
+
+              {/* Action Button */}
+              <div className="pt-2">
+                {isPremium ? (
+                  <div className="w-full py-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold rounded-xl text-xs flex items-center justify-center gap-2">
+                    <ShieldCheck className="h-4.5 w-4.5" /> Estás suscrito al Plan Premium
+                  </div>
+                ) : (
+                  <a 
+                    href={paymentLink || "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold font-display rounded-xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-emerald-500/10 text-center"
+                  >
+                    <CreditCard className="h-4 w-4" /> Adquirir Acceso Premium Pro — Solo {displayPrice} &rarr;
+                  </a>
+                )}
+                <p className="text-[10px] text-zinc-500 text-center mt-2.5">
+                  Procesado de forma segura. Cancela seguro en cualquier momento.
+                </p>
+              </div>
+            </div>
+
+            {/* Simulation Helper */}
+            {!isPremium && (
+              <div className="pt-6 mt-4 border-t border-dashed border-zinc-800/60 flex items-center justify-between gap-2">
+                <span className="text-[10px] text-zinc-500 font-mono">¿Quieres activar la demo/Premium directo para ver cómo funciona?</span>
+                <button
+                  onClick={() => setSimulatedRole("premium_active")}
+                  className="px-2.5 py-1 text-[9px] font-mono font-bold bg-zinc-900 border border-zinc-800 hover:bg-zinc-805 text-emerald-400 rounded-lg cursor-pointer shrink-0 transition-colors"
+                >
+                  Simular Pago Exitoso
+                </button>
+              </div>
+            )}
+          </div>
+          
+          {/* Features Checklist */}
+          <div className="bg-zinc-950 border border-zinc-850 rounded-3xl p-8 space-y-6">
+            <h4 className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold">
+              ¿Qué incluye tu Acceso Premium?
+            </h4>
+            
+            <div className="space-y-4">
+              {[
+                { title: "Diagnóstico Completo", desc: "Cálculo automático de score de marketing, brechas y potencial de ventas de tu negocio." },
+                { title: "Estrategias de Posicionamiento", desc: "Modelado estratégico de tu producto de alto valor y mensajes de atracción." },
+                { title: "Calendario de Publicaciones", desc: "Formulación de tu cronograma diario de 30 días con ángulos de venta." },
+                { title: "Banco de Ideas Ilimitado", desc: "Acceso completo a ganchos y llamados a la acción redactados por IA." },
+                { title: "Guiones de Video Directo", desc: "Construcción instantánea de hooks, problemas, desarrollos y llamadas a la acción." },
+                { title: "Auditoría de Perfil Instagram y Bio", desc: "Análisis técnico de optimización de perfil e instrumentación de enlaces." },
+                { title: "Asistente Estratégico AI", desc: "Consultoría 1-a-1 libre con el motor Gemini 3.5 adaptado a tu negocio." },
+              ].map((benefit, i) => (
+                <div key={i} className="flex gap-3 text-left">
+                  <div className="bg-emerald-500/10 p-1 rounded-lg text-emerald-400 h-max shrink-0 mt-0.5 font-sans">
+                    <Check className="h-3.5 w-3.5" />
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-bold text-white">{benefit.title}</h5>
+                    <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">{benefit.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* FAQs */}
+        <div className="bg-zinc-900/40 border border-zinc-850 rounded-2xl p-6.5 space-y-4">
+          <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-2">
+            <Info className="h-4 w-4 text-emerald-400" /> Preguntas Frecuentes
+          </h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <div className="space-y-1.5">
+              <h5 className="text-xs font-bold text-white flex items-center gap-1">¿Cómo se activa mi cuenta Pro tras el pago?</h5>
+              <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">
+                Una vez realizado el pago en la pasarela segura (como Hotmart), recibirás un correo de confirmación de inmediato. El sistema desbloquea automáticamente todas las descargas del calendario de 30 días y guiones Premium para tu marca.
+              </p>
+            </div>
+            
+            <div className="space-y-1.5">
+              <h5 className="text-xs font-bold text-white flex items-center gap-1">¿Puedo cancelar la suscripción?</h5>
+              <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">
+                Sí, por supuesto. Puedes cancelar tu suscripción sin cargos adicionales ni compromisos de permanencia mínimos en cualquier momento directamente desde tu panel de usuario o comunicándote con el correo de soporte.
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <h5 className="text-xs font-bold text-white flex items-center gap-1">¿Qué pasará con mis datos tras la suscripción?</h5>
+              <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">
+                Todos tus diagnósticos ya ejecutados, estrategias generadas y marca corporativa se guardarán de forma privada y segura en tu navegador y consola local para que continúes sin interrupción.
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <h5 className="text-xs font-bold text-white flex items-center gap-1">¿Cómo contacto con soporte de la plataforma?</h5>
+              <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">
+                Ofrecemos soporte personalizado rápido para todos nuestros clientes de pago. Puedes escribir directamente a nuestro correo de contacto o por WhatsApp para resolver dudas de configuración.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -122,7 +301,7 @@ export default function MonetizationView({
                   type="text"
                   value={monthlyPrice}
                   onChange={(e) => setMonthlyPrice(e.target.value)}
-                  placeholder="Ej: $29 USD / mes"
+                  placeholder="Ej: $7 USD / mes"
                   className="w-full bg-zinc-950/70 border border-zinc-800 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 placeholder-zinc-650 outline-none transition-colors"
                 />
               </div>
@@ -271,7 +450,7 @@ export default function MonetizationView({
                 <div className="space-y-1.5 mt-1">
                   <p>1. Envías este link a un prospecto o lo pones en tu biografía de redes sociales como un gancho consultivo.</p>
                   <p>2. El prospecto usa la prueba de <strong className="text-zinc-200">{trialDays} días</strong> para hacer su diagnóstico de negocio gratuitos en tu consola.</p>
-                  <p>3. Al querer bajar sus guiones tácticos o cronograma diario, se suscribe con tu link de <strong className="text-zinc-200">{monthlyPrice || "$29/mes"}</strong>.</p>
+                  <p>3. Al querer bajar sus guiones tácticos o cronograma diario, se suscribe con tu link de <strong className="text-zinc-200">{monthlyPrice || "$7/mes"}</strong>.</p>
                 </div>
               </div>
             </div>
@@ -355,7 +534,7 @@ export default function MonetizationView({
 
               <div className="bg-zinc-950/70 border border-zinc-850 p-3 rounded-xl space-y-1.5 text-center font-sans">
                 <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-semibold block">Suscripción Acceso Premium</span>
-                <p className="text-base font-extrabold text-white">{monthlyPrice || "$29.00 USD"} <span className="text-xs text-zinc-550 font-normal">/ mes</span></p>
+                <p className="text-base font-extrabold text-white">{monthlyPrice || "$7.00 USD"} <span className="text-xs text-zinc-550 font-normal">/ mes</span></p>
               </div>
 
               <a

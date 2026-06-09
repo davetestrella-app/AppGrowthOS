@@ -12,7 +12,8 @@ import {
   TrendingUp,
   X,
   Menu,
-  DollarSign
+  DollarSign,
+  CreditCard
 } from "lucide-react";
 
 export type ActiveTab = 
@@ -138,7 +139,7 @@ export default function Sidebar({
               );
             })}
 
-            {simulatedRole === "creator" && (
+            {simulatedRole === "creator" ? (
               <>
                 <span className="px-3 text-[10px] text-zinc-550 font-mono tracking-widest uppercase mt-3 mb-1 block">Configurar SaaS</span>
                 <button
@@ -159,6 +160,30 @@ export default function Sidebar({
                   <div>
                     <p className="text-sm font-bold leading-none text-emerald-400">Monetizar SaaS</p>
                     <p className="text-[10px] text-zinc-500 mt-1 font-normal group-hover:text-zinc-400 leading-none">Pruebas y Planes</p>
+                  </div>
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="px-3 text-[10px] text-zinc-550 font-mono tracking-widest uppercase mt-3 mb-1 block">Suscripción</span>
+                <button
+                  id="nav-tab-monetization"
+                  onClick={() => {
+                    setActiveTab("monetization");
+                    setIsOpen(false);
+                  }}
+                  className={`
+                    w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group text-left border border-dashed
+                    ${activeTab === "monetization" 
+                      ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)] font-medium" 
+                      : "text-zinc-400 hover:text-white hover:bg-[#18181b]/60 border-zinc-800"
+                    }
+                  `}
+                >
+                  <CreditCard className={`h-4.5 w-4.5 shrink-0 ${activeTab === "monetization" ? "text-emerald-400" : "text-zinc-500"}`} />
+                  <div>
+                    <p className="text-sm font-bold leading-none text-emerald-400">Detalles del Plan</p>
+                    <p className="text-[10px] text-zinc-500 mt-1 font-normal group-hover:text-zinc-400 leading-none">Plan Premium</p>
                   </div>
                 </button>
               </>
